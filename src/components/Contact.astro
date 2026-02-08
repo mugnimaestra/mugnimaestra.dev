@@ -74,12 +74,20 @@
   }
   .contact-link:hover { color: var(--accent); }
 
-  @media (max-width: 480px) {
+  @media (max-width: 600px) {
     .contact-links {
       flex-direction: column;
       align-items: center;
       gap: var(--space-md);
     }
+    .contact-link {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+    }
+  }
+
+  @media (max-width: 480px) {
     .contact-btn {
       padding: 0.85rem 2rem;
       font-size: 0.95rem;
@@ -87,9 +95,10 @@
       justify-content: center;
     }
     .contact-link {
-      min-height: 44px;
-      display: inline-flex;
-      align-items: center;
+      font-size: 0.85rem;
+    }
+    .contact-desc {
+      font-size: 1rem;
     }
   }
 

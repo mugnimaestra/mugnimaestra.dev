@@ -250,8 +250,9 @@
   }
 
   .hero-title {
-    font-size: clamp(3rem, 6vw, 5.5rem);
+    font-size: clamp(2.5rem, 6vw, 5.5rem);
     margin-bottom: var(--space-md);
+    overflow-wrap: break-word;
   }
   .hero-accent {
     color: var(--accent);
@@ -268,6 +269,7 @@
     font-size: 1.1rem;
     max-width: 520px;
     margin-bottom: var(--space-xl);
+    overflow-wrap: break-word;
   }
   .hero-highlight {
     color: var(--accent);
@@ -433,19 +435,89 @@
       height: 300px;
     }
   }
-  @media (max-width: 480px) {
+
+  @media (max-width: 768px) {
+    .hero {
+      padding-top: 4.5rem;
+      padding-bottom: 2.5rem;
+    }
+    .hero-title {
+      font-size: clamp(2.25rem, 8vw, 3.25rem);
+    }
+    .hero-desc {
+      font-size: 1rem;
+    }
+    .hero-role {
+      font-size: 0.95rem;
+    }
     .hero-actions {
       flex-direction: column;
+      gap: var(--space-sm);
     }
     .hero-actions .btn {
       text-align: center;
       justify-content: center;
+      width: 100%;
     }
     .hero-stats {
-      gap: var(--space-lg);
+      gap: var(--space-xl);
       row-gap: var(--space-md);
     }
+    .hero-stat-num {
+      font-size: 1.75rem;
+    }
+    .hero-stat-divider {
+      height: 32px;
+    }
+    .hero-visual {
+      height: 260px;
+    }
+    .hero-badge {
+      padding: 0.35rem 0.85rem;
+    }
+    .hero-badge .text-label {
+      font-size: 0.65rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .hero {
+      padding-top: 4rem;
+      padding-bottom: 2rem;
+    }
+    .hero-title {
+      font-size: clamp(2rem, 9vw, 2.75rem);
+    }
+    .hero-desc {
+      font-size: 0.95rem;
+    }
     .hero-stat-divider { display: none; }
-    .hero-visual { height: 220px; }
+    .hero-stats {
+      gap: var(--space-lg);
+      row-gap: var(--space-sm);
+    }
+    .hero-stat-num {
+      font-size: 1.5rem;
+    }
+    .hero-stat-label {
+      font-size: 0.65rem;
+    }
+    .hero-visual { height: 200px; }
+    .hero-scroll-indicator {
+      display: none;
+    }
+    .tech-float {
+      font-size: 0.65rem;
+      padding: 0.25rem 0.65rem;
+    }
+  }
+
+  @media (max-width: 360px) {
+    .hero-title {
+      font-size: 1.85rem;
+    }
+    .hero-visual {
+      height: 160px;
+    }
   }
 </style>

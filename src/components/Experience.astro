@@ -169,4 +169,28 @@ const experiences = [
     .timeline-header { flex-direction: column; }
     .timeline-period { align-self: flex-start; }
   }
+
+  @media (max-width: 480px) {
+    .timeline-item {
+      grid-template-columns: 24px 1fr;
+      gap: var(--space-md);
+    }
+    .timeline-dot {
+      width: 12px;
+      height: 12px;
+    }
+    .timeline-highlights li {
+      font-size: 0.88rem;
+      padding-left: 1rem;
+    }
+    .timeline-company {
+      font-size: 0.78rem;
+    }
+    .timeline-desc {
+      font-size: 0.85rem;
+    }
+    .timeline-content {
+      padding-bottom: var(--space-2xl);
+    }
+  }
 </style>
