@@ -86,31 +86,31 @@
       role: 'assistant',
       toolCall: 'read_profile()',
       content:
-        "Mugni is a Software Engineer from Jakarta who's been shipping web and mobile products for 7+ years. The kind of dev who obsesses over the button click experience as much as the system architecture behind it.",
+        "Full-stack engineer from Jakarta. 7 years in, still gets excited about a clean API response and a smooth scroll animation. Currently building at Rukita.",
       tokens: 1247,
       cost: 0.01,
     },
     {
       role: 'user',
-      content: "what's his stack?",
+      content: 'how does he work?',
     },
     {
       role: 'assistant',
-      toolCall: 'get_tech_stack()',
+      toolCall: 'get_workflow()',
       content:
-        'React, Next.js, React Native, TypeScript — those are his daily drivers. He\'s shipped 297+ features across 8 products. Oh, and he\'s big on AI-assisted development — thinks of it as a "multiplier, not a replacement."',
+        "Pairs with AI (Claude Code, Copilot) to move fast, but every PR still gets proper test coverage. His philosophy: AI is a multiplier, not a shortcut. Stack: React, Next.js, React Native, TypeScript.",
       tokens: 2834,
       cost: 0.03,
     },
     {
       role: 'user',
-      content: "what's he building right now?",
+      content: 'what has he shipped recently?',
     },
     {
       role: 'assistant',
-      toolCall: 'get_current_role()',
+      toolCall: 'get_recent_work()',
       content:
-        "Currently at Rukita — Indonesia's leading proptech platform with 1,500+ rental properties across 21 cities. He works across the full surface: customer-facing web, mobile apps, internal tools. Wherever there's code that needs to be better, he's there.",
+        "Built Rukita's in-house chat system from scratch — replaced Salesforce, saved $15K/year. Handles customer service across web, mobile, and WhatsApp. Before that, led a full platform rebuild shipped in 3 months.",
       tokens: 4102,
       cost: 0.04,
     },
@@ -122,7 +122,7 @@
       role: 'assistant',
       toolCall: 'check_availability()',
       content:
-        "He's always interested in meaningful work and great engineering challenges. Drop a line at iam@mugnimaestra.dev — he reads every email.",
+        "Open to interesting engineering problems and new challenges. Reach out at iam@mugnimaestra.dev — he responds to every message.",
       tokens: 4891,
       cost: 0.05,
       isLast: true,
@@ -135,8 +135,8 @@
   // Phase data: icon, title (bold), subtitle (dim)
   const PHASES = [
     { icon: '🔍', title: 'Profile', desc: 'Understanding the engineer behind the code' },
-    { icon: '⚙️', title: 'Tech Stack', desc: 'Mapping core technologies and expertise' },
-    { icon: '🏗️', title: 'Current Role', desc: 'Reviewing active projects and responsibilities' },
+    { icon: '⚙️', title: 'Workflow', desc: 'How he builds and ships software' },
+    { icon: '🏗️', title: 'Recent Work', desc: 'What he shipped and the impact it made' },
     { icon: '📬', title: 'Contact', desc: 'Finding the best way to connect' },
   ];
 
