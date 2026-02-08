@@ -1,43 +1,53 @@
-# Astro Starter Kit: Minimal
+# mugnimaestra.dev
 
-```sh
-bun create astro@latest -- --template minimal
+Personal portfolio website for **Muhammad Mugni Hadi** — Software Engineer.
+
+🔗 **[mugnimaestra.dev](https://mugnimaestra.dev)**
+
+## About
+
+A minimal, dark-themed portfolio showcasing 7+ years of experience building web and mobile products. Built with Astro for fast static delivery and deployed on Cloudflare Pages.
+
+### Sections
+
+- **Hero** — Introduction with animated code graphic
+- **About** — Background and working style
+- **Experience** — Career timeline (Rukita, Qontak, freelance)
+- **Projects** — Featured work with tech details
+- **Skills** — Tech stack grid
+- **Contact** — Email CTA
+
+## Tech Stack
+
+- [Astro](https://astro.build) — Static site framework
+- Vanilla CSS — Custom properties, animations, responsive design
+- [Cloudflare Pages](https://pages.cloudflare.com) — Hosting & CDN
+
+## Getting Started
+
+```bash
+# Install dependencies
+npm install
+
+# Start dev server at localhost:4321
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Deployment
 
-## 🚀 Project Structure
+The site is deployed to [Cloudflare Pages](https://pages.cloudflare.com). To deploy manually:
 
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+```bash
+npm run build
+npx wrangler pages deploy dist --project-name mugnimaestra-dev
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## License
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
-
-Any static assets, like images, can be placed in the `public/` directory.
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `bun install`             | Installs dependencies                            |
-| `bun dev`             | Starts local dev server at `localhost:4321`      |
-| `bun build`           | Build your production site to `./dist/`          |
-| `bun preview`         | Preview your build locally, before deploying     |
-| `bun astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `bun astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+© Muhammad Mugni Hadi. All rights reserved.
