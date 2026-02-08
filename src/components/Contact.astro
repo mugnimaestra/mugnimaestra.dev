@@ -10,8 +10,8 @@
       </h2>
     </div>
     <p class="contact-desc text-body reveal reveal-delay-1">
-      I'm always open to new opportunities, interesting projects, 
-      or just a good conversation about building great software.
+      I enjoy connecting with people who care about building great software — 
+      whether it's a collaboration, an interesting project, or just a good engineering conversation.
     </p>
     <a href="mailto:iam@mugnimaestra.dev" class="btn btn-primary contact-btn reveal reveal-delay-2">
       Say hello →
@@ -73,6 +73,25 @@
     transition: color 0.2s ease;
   }
   .contact-link:hover { color: var(--accent); }
+
+  @media (max-width: 480px) {
+    .contact-links {
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-md);
+    }
+    .contact-btn {
+      padding: 0.85rem 2rem;
+      font-size: 0.95rem;
+      width: 100%;
+      justify-content: center;
+    }
+    .contact-link {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+    }
+  }
 
   .footer {
     padding: var(--space-2xl) 0;

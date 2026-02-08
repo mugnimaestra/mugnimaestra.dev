@@ -1,0 +1,1030 @@
+---
+---
+
+<section class="terminal-section section" id="terminal-chat">
+  <div class="container container--narrow">
+    <div class="terminal-wrapper reveal">
+
+
+      <!-- Terminal Body — raw terminal look, rounded container -->
+      <div class="terminal-body" id="terminal-body">
+        <!-- ASCII header -->
+        <div class="terminal-header" id="terminal-header">
+          <pre class="terminal-ascii-banner">╭────────────────────────────────────────╮
+│  ✦  <span class="tc-cyan">claude</span>  —  mugni@maestra ~ <span class="tc-dim">v1.0.0</span>  │
+╰────────────────────────────────────────╯</pre>
+        </div>
+
+        <!-- Message area -->
+        <div class="terminal-messages" id="terminal-messages"></div>
+
+        <!-- Input prompt area (Claude Code style bordered box) -->
+        <div class="terminal-input-area" id="terminal-input-area">
+          <div class="terminal-input-box" id="terminal-input-box">
+            <span class="input-caret">&gt;</span>
+            <span class="terminal-cursor" id="terminal-cursor"></span>
+          </div>
+          <div class="terminal-edit-hint" id="terminal-edit-hint">
+            <span class="edit-arrows">⏵⏵</span> <span class="edit-label">accept edits on</span> <span class="edit-hint-dim">(shift+tab to cycle)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress bars (Sentry-style: rounded pill segments) -->
+      <div class="terminal-progress" id="terminal-progress">
+        <div class="progress-segment" data-phase="0"></div>
+        <div class="progress-segment" data-phase="1"></div>
+        <div class="progress-segment" data-phase="2"></div>
+        <div class="progress-segment" data-phase="3"></div>
+      </div>
+
+      <!-- Phase label (icon + title + description) -->
+      <div class="terminal-phase" id="terminal-phase">
+        <div class="phase-content" id="phase-content">
+          <span class="phase-icon" id="phase-icon"></span>
+          <span class="phase-title" id="phase-title"></span>
+        </div>
+        <span class="phase-desc" id="phase-desc"></span>
+      </div>
+
+      <!-- Replay button (Sentry-style: pill shaped, prominent) -->
+      <button class="replay-btn" id="replay-btn" aria-label="Replay animation" title="Replay">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="1 4 1 10 7 10"></polyline>
+          <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+        </svg>
+      </button>
+
+      <!-- Status bar at bottom -->
+      <div class="terminal-statusbar">
+        <div class="statusbar-left">
+          <span class="statusbar-model"><span class="tc-accent">✦</span> Sonnet</span>
+          <span class="statusbar-sep">│</span>
+          <span class="statusbar-path">~/mugni/portfolio</span>
+        </div>
+        <div class="statusbar-right">
+          <span class="statusbar-branch">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -1px; margin-right: 3px;"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>main
+          </span>
+          <span class="statusbar-sep">│</span>
+          <span class="statusbar-tokens" id="statusbar-tokens">0 tokens</span>
+          <span class="statusbar-sep">│</span>
+          <span class="statusbar-cost" id="statusbar-cost">$0.00</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const conversation = [
+    {
+      role: 'user',
+      content: 'who is mugni?',
+    },
+    {
+      role: 'assistant',
+      toolCall: 'read_profile()',
+      content:
+        "Mugni is a Software Engineer from Jakarta who's been shipping web and mobile products for 7+ years. The kind of dev who obsesses over the button click experience as much as the system architecture behind it.",
+      tokens: 1247,
+      cost: 0.01,
+    },
+    {
+      role: 'user',
+      content: "what's his stack?",
+    },
+    {
+      role: 'assistant',
+      toolCall: 'get_tech_stack()',
+      content:
+        'React, Next.js, React Native, TypeScript — those are his daily drivers. He\'s shipped 297+ features across 8 products. Oh, and he\'s big on AI-assisted development — thinks of it as a "multiplier, not a replacement."',
+      tokens: 2834,
+      cost: 0.03,
+    },
+    {
+      role: 'user',
+      content: "what's he building right now?",
+    },
+    {
+      role: 'assistant',
+      toolCall: 'get_current_role()',
+      content:
+        "Currently at Rukita — Indonesia's leading proptech platform with 1,500+ rental properties across 21 cities. He works across the full surface: customer-facing web, mobile apps, internal tools. Wherever there's code that needs to be better, he's there.",
+      tokens: 4102,
+      cost: 0.04,
+    },
+    {
+      role: 'user',
+      content: 'can I work with him?',
+    },
+    {
+      role: 'assistant',
+      toolCall: 'check_availability()',
+      content:
+        "He's always interested in meaningful work and great engineering challenges. Drop a line at iam@mugnimaestra.dev — he reads every email.",
+      tokens: 4891,
+      cost: 0.05,
+      isLast: true,
+    },
+  ];
+
+  // Braille spinner frames (actual Claude Code style)
+  const SPINNER_FRAMES = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
+
+  // Phase data: icon, title (bold), subtitle (dim)
+  const PHASES = [
+    { icon: '🔍', title: 'Profile', desc: 'Understanding the engineer behind the code' },
+    { icon: '⚙️', title: 'Tech Stack', desc: 'Mapping core technologies and expertise' },
+    { icon: '🏗️', title: 'Current Role', desc: 'Reviewing active projects and responsibilities' },
+    { icon: '📬', title: 'Contact', desc: 'Finding the best way to connect' },
+  ];
+
+  const CHAR_DELAY = 18;
+  const USER_CHAR_DELAY = 35;
+  const PAUSE_AFTER_USER = 500;
+  const PAUSE_AFTER_ASSISTANT = 700;
+  const INITIAL_DELAY = 600;
+  const SPINNER_DURATION = 900;
+  const TOOL_CALL_DISPLAY_DURATION = 300;
+
+  const messagesContainer = document.getElementById('terminal-messages')!;
+  const terminalBody = document.getElementById('terminal-body')!;
+  const inputArea = document.getElementById('terminal-input-area')!;
+  const tokenDisplay = document.getElementById('statusbar-tokens')!;
+  const costDisplay = document.getElementById('statusbar-cost')!;
+  const replayBtn = document.getElementById('replay-btn')!;
+  const phaseIconEl = document.getElementById('phase-icon')!;
+  const phaseTitleEl = document.getElementById('phase-title')!;
+  const phaseDescEl = document.getElementById('phase-desc')!;
+  const terminalWrapper = document.querySelector('.terminal-wrapper')!;
+
+
+  let hasPlayed = false;
+  let prevTokens = 0;
+  let prevCost = 0;
+
+  function scrollToBottom() {
+    terminalBody.scrollTop = terminalBody.scrollHeight;
+  }
+
+  function delay(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  // ── Animated token counter ──
+  function animateCounter(
+    element: HTMLElement,
+    from: number,
+    to: number,
+    duration: number,
+    formatter: (n: number) => string
+  ) {
+    const startTime = performance.now();
+    const diff = to - from;
+
+    function tick(currentTime: number) {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = from + diff * eased;
+      element.textContent = formatter(current);
+      if (progress < 1) requestAnimationFrame(tick);
+    }
+
+    requestAnimationFrame(tick);
+  }
+
+  function updateStatusbar(tokens: number, cost: number) {
+    animateCounter(tokenDisplay, prevTokens, tokens, 600, (n) =>
+      `${Math.round(n).toLocaleString()} tokens`
+    );
+    animateCounter(costDisplay, prevCost, cost, 600, (n) =>
+      `$${n.toFixed(2)}`
+    );
+    prevTokens = tokens;
+    prevCost = cost;
+  }
+
+  function resetStatusbar() {
+    prevTokens = 0;
+    prevCost = 0;
+    tokenDisplay.textContent = '0 tokens';
+    costDisplay.textContent = '$0.00';
+  }
+
+  // ── Progress dots (Sentry-style pill segments) ──
+  function updateProgress(pairIndex: number) {
+    const segments = document.querySelectorAll('.progress-segment');
+    segments.forEach((seg, i) => {
+      seg.classList.remove('active', 'completed');
+      if (i < pairIndex) seg.classList.add('completed');
+      if (i === pairIndex) seg.classList.add('active');
+    });
+  }
+
+  function completeAllProgress() {
+    document.querySelectorAll('.progress-segment').forEach((seg) => {
+      seg.classList.remove('active');
+      seg.classList.add('completed');
+    });
+  }
+
+  function resetProgress() {
+    document.querySelectorAll('.progress-segment').forEach((seg) => {
+      seg.classList.remove('active', 'completed');
+    });
+  }
+
+  // ── Sentry-style phase labels with icon + title + description ──
+  function updatePhaseLabel(pairIndex: number) {
+    if (pairIndex >= 0 && pairIndex < PHASES.length) {
+      const phase = PHASES[pairIndex];
+      // Fade out
+      const phaseEl = document.getElementById('terminal-phase')!;
+      phaseEl.style.opacity = '0';
+      setTimeout(() => {
+        phaseIconEl.textContent = phase.icon;
+        phaseTitleEl.textContent = phase.title;
+        phaseDescEl.textContent = phase.desc;
+        phaseEl.style.opacity = '1';
+      }, 200);
+    }
+  }
+
+  function showCompletionLabel() {
+    const phaseEl = document.getElementById('terminal-phase')!;
+    phaseEl.style.opacity = '0';
+    setTimeout(() => {
+      phaseIconEl.textContent = '✦';
+      phaseTitleEl.textContent = 'Complete';
+      phaseDescEl.textContent = 'Conversation finished successfully';
+      phaseEl.style.opacity = '1';
+    }, 200);
+  }
+
+  function resetPhaseLabel() {
+    phaseIconEl.textContent = '';
+    phaseTitleEl.textContent = '';
+    phaseDescEl.textContent = '';
+    const phaseEl = document.getElementById('terminal-phase')!;
+    phaseEl.style.opacity = '0';
+  }
+
+  // ── Build user message ──
+  function createUserMessage(content: string): HTMLDivElement {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'tc-msg tc-msg--user';
+
+    const line = document.createElement('div');
+    line.className = 'tc-prompt-line';
+
+    const symbol = document.createElement('span');
+    symbol.className = 'tc-prompt-symbol';
+    symbol.textContent = '❯';
+
+    const text = document.createElement('span');
+    text.className = 'tc-user-input';
+
+    line.appendChild(symbol);
+    line.appendChild(text);
+    wrapper.appendChild(line);
+
+    return wrapper;
+  }
+
+  // ── Build assistant message with ● bullet ──
+  function createAssistantMessage(): HTMLDivElement {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'tc-msg tc-msg--assistant';
+
+    const block = document.createElement('div');
+    block.className = 'tc-response-block';
+
+    const bullet = document.createElement('span');
+    bullet.className = 'tc-bullet';
+    bullet.textContent = '●';
+
+    const text = document.createElement('span');
+    text.className = 'tc-response-text';
+
+    block.appendChild(bullet);
+    block.appendChild(text);
+    wrapper.appendChild(block);
+
+    return wrapper;
+  }
+
+  // ── Typewriter with natural variance ──
+  async function typeText(
+    element: HTMLElement,
+    text: string,
+    baseDelay: number
+  ): Promise<void> {
+    for (let i = 0; i < text.length; i++) {
+      element.textContent += text[i];
+      scrollToBottom();
+
+      const variance = baseDelay * 0.4;
+      let charDelay = baseDelay + (Math.random() * variance * 2 - variance);
+
+      // 5% chance of a "thinking" micro-pause
+      if (Math.random() < 0.05) {
+        charDelay += 40 + Math.random() * 80;
+      }
+
+      // Slight pause after punctuation marks
+      if ('.!?,;—:'.includes(text[i]) && i < text.length - 1) {
+        charDelay += 20 + Math.random() * 40;
+      }
+
+      await delay(charDelay);
+    }
+  }
+
+  // ── Tool call display (Claude Code style) ──
+  async function showToolCall(name: string): Promise<void> {
+    const el = document.createElement('div');
+    el.className = 'tc-toolcall';
+
+    const icon = document.createElement('span');
+    icon.className = 'tc-toolcall-icon';
+    icon.textContent = '⚡';
+
+    const tag = document.createElement('span');
+    tag.className = 'tc-toolcall-tag';
+    tag.textContent = ' claude ';
+
+    const dash = document.createElement('span');
+    dash.className = 'tc-toolcall-dash';
+    dash.textContent = '— ';
+
+    const fnName = document.createElement('span');
+    fnName.className = 'tc-toolcall-name';
+    fnName.textContent = name + ' ';
+
+    const badge = document.createElement('span');
+    badge.className = 'tc-toolcall-badge';
+    badge.textContent = '(MCP)';
+
+    el.appendChild(icon);
+    el.appendChild(tag);
+    el.appendChild(dash);
+    el.appendChild(fnName);
+    el.appendChild(badge);
+
+    messagesContainer.appendChild(el);
+    scrollToBottom();
+    await delay(TOOL_CALL_DISPLAY_DURATION);
+  }
+
+  // ── Pollinating spinner (authentic Claude Code) ──
+  async function showSpinner(duration: number): Promise<void> {
+    const spinnerEl = document.createElement('div');
+    spinnerEl.className = 'tc-spinner-line';
+
+    const spinnerIcon = document.createElement('span');
+    spinnerIcon.className = 'tc-spinner-icon';
+
+    const label = document.createElement('span');
+    label.className = 'tc-spinner-label';
+    label.textContent = 'Pollinating…';
+
+    const hint = document.createElement('span');
+    hint.className = 'tc-spinner-hint';
+    hint.textContent = '(esc to interrupt)';
+
+    spinnerEl.appendChild(spinnerIcon);
+    spinnerEl.appendChild(label);
+    spinnerEl.appendChild(hint);
+    messagesContainer.appendChild(spinnerEl);
+    scrollToBottom();
+
+    let frame = 0;
+    const interval = setInterval(() => {
+      spinnerIcon.textContent = SPINNER_FRAMES[frame % SPINNER_FRAMES.length];
+      frame++;
+    }, 80);
+
+    await delay(duration);
+    clearInterval(interval);
+    spinnerEl.remove();
+  }
+
+  // ── Main playback ──
+  async function playConversation() {
+    if (hasPlayed) return;
+    hasPlayed = true;
+
+    // Terminal glow on activation
+    terminalWrapper.classList.add('activated');
+
+
+    await delay(INITIAL_DELAY);
+
+    for (let i = 0; i < conversation.length; i++) {
+      const msg = conversation[i];
+      const pairIndex = Math.floor(i / 2);
+
+      // Hide input area while animating
+      inputArea.style.display = 'none';
+
+      if (msg.role === 'user') {
+        // Update progress and phase for this pair
+        updateProgress(pairIndex);
+        updatePhaseLabel(pairIndex);
+
+        const msgEl = createUserMessage(msg.content);
+        messagesContainer.appendChild(msgEl);
+
+        const textEl = msgEl.querySelector('.tc-user-input') as HTMLElement;
+        await typeText(textEl, msg.content, USER_CHAR_DELAY);
+        await delay(PAUSE_AFTER_USER);
+      } else {
+        // Show tool call indicator if present
+        if ((msg as any).toolCall) {
+          await showToolCall((msg as any).toolCall);
+        }
+
+        // Show spinner
+        await showSpinner(SPINNER_DURATION);
+
+        // Then render message
+        const msgEl = createAssistantMessage();
+        messagesContainer.appendChild(msgEl);
+
+        const textEl = msgEl.querySelector('.tc-response-text') as HTMLElement;
+        await typeText(textEl, msg.content, CHAR_DELAY);
+
+        // If last message, linkify email
+        if ((msg as any).isLast) {
+          const html = textEl.textContent!.replace(
+            'iam@mugnimaestra.dev',
+            '<a href="mailto:iam@mugnimaestra.dev" class="tc-link">iam@mugnimaestra.dev</a>'
+          );
+          textEl.innerHTML = html;
+        }
+
+        // Update status bar tokens/cost with animation
+        updateStatusbar((msg as any).tokens, (msg as any).cost);
+
+        await delay(PAUSE_AFTER_ASSISTANT);
+      }
+    }
+
+    // Animation complete
+    completeAllProgress();
+    showCompletionLabel();
+
+    // Show idle input area at end
+    inputArea.style.display = 'block';
+    scrollToBottom();
+
+    // Show replay button
+    replayBtn.classList.add('visible');
+  }
+
+  // ── Replay handler ──
+  replayBtn.addEventListener('click', () => {
+    hasPlayed = false;
+    messagesContainer.innerHTML = '';
+    replayBtn.classList.remove('visible');
+    inputArea.style.display = 'none';
+    resetStatusbar();
+    resetProgress();
+    resetPhaseLabel();
+    terminalWrapper.classList.remove('activated');
+
+    playConversation();
+  });
+
+  // Trigger on scroll into view
+  const section = document.getElementById('terminal-chat')!;
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && !hasPlayed) {
+          playConversation();
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.3 }
+  );
+  observer.observe(section);
+</script>
+
+<style>
+  .terminal-section {
+    padding: var(--space-3xl) 0;
+  }
+
+  /* ─── Terminal wrapper — rounded container ─── */
+  .terminal-wrapper {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: linear-gradient(135deg, #0d0d12 0%, #12101a 50%, #0f0e16 100%);
+    box-shadow:
+      0 24px 80px -16px rgba(0, 0, 0, 0.8),
+      0 0 1px 0 rgba(255, 255, 255, 0.03);
+  }
+
+  /* ─── Terminal glow on activation ─── */
+  @keyframes terminal-activate {
+    0% {
+      box-shadow:
+        0 24px 80px -16px rgba(0, 0, 0, 0.8),
+        0 0 1px 0 rgba(255, 255, 255, 0.03),
+        0 0 0 0 rgba(93, 228, 199, 0);
+    }
+    30% {
+      box-shadow:
+        0 24px 80px -16px rgba(0, 0, 0, 0.8),
+        0 0 1px 0 rgba(255, 255, 255, 0.03),
+        0 0 50px -8px rgba(93, 228, 199, 0.08);
+    }
+    100% {
+      box-shadow:
+        0 24px 80px -16px rgba(0, 0, 0, 0.8),
+        0 0 1px 0 rgba(255, 255, 255, 0.03),
+        0 0 0 0 rgba(93, 228, 199, 0);
+    }
+  }
+
+  .terminal-wrapper.activated {
+    animation: terminal-activate 2s ease-out;
+  }
+
+
+
+  /* ─── Terminal body ─── */
+  .terminal-body {
+    padding: 1.25rem 1.5rem;
+    min-height: 300px;
+    max-height: 520px;
+    overflow-y: auto;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    line-height: 1.65;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.06) transparent;
+  }
+  .terminal-body::-webkit-scrollbar { width: 5px; }
+  .terminal-body::-webkit-scrollbar-track { background: transparent; }
+  .terminal-body::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.06); border-radius: 3px; }
+
+  /* ─── ASCII banner ─── */
+  .terminal-ascii-banner {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--text-tertiary);
+    line-height: 1.4;
+    margin-bottom: 1.25rem;
+    user-select: none;
+  }
+
+  /* ─── Color utility classes ─── */
+  .tc-cyan { color: #5de4c7; }
+  .tc-accent { color: var(--accent); }
+  .tc-dim { color: #555; }
+
+  /* ─── Message entrance animation ─── */
+  @keyframes msg-enter {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* ─── Messages container ─── */
+  .terminal-messages {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .tc-msg {
+    animation: msg-enter 0.35s ease-out both;
+  }
+
+  /* ─── User prompt ─── */
+  .tc-msg--user {
+    margin-bottom: 0.15rem;
+  }
+
+  .tc-prompt-line {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .tc-prompt-symbol {
+    color: #5de4c7;
+    font-weight: 700;
+    flex-shrink: 0;
+    line-height: 1.65;
+  }
+
+  .tc-user-input {
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+
+  /* ─── Assistant response block with ● bullet ─── */
+  .tc-msg--assistant {
+    margin-bottom: 0.4rem;
+  }
+
+  .tc-response-block {
+    padding-left: 0.15rem;
+  }
+
+  .tc-bullet {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.55rem;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+
+  .tc-response-text {
+    color: #c4c4c4;
+    line-height: 1.7;
+    max-width: 640px;
+    display: inline;
+  }
+
+  /* ─── Tool call indicator ─── */
+  .tc-toolcall {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding-left: 0.15rem;
+    margin: 0.15rem 0;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    animation: msg-enter 0.25s ease-out both;
+  }
+
+  .tc-toolcall-icon {
+    color: #e2a35f;
+    font-size: 0.85rem;
+  }
+
+  .tc-toolcall-tag {
+    color: #e2a35f;
+    font-weight: 600;
+  }
+
+  .tc-toolcall-dash {
+    color: rgba(255, 255, 255, 0.15);
+    margin: 0 0.1rem;
+  }
+
+  .tc-toolcall-name {
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .tc-toolcall-badge {
+    color: rgba(255, 255, 255, 0.2);
+    font-size: 0.7rem;
+    margin-left: 0.15rem;
+  }
+
+  /* ─── Pollinating spinner ─── */
+  .tc-spinner-line {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding-left: 0.15rem;
+    margin: 0.2rem 0;
+    animation: msg-enter 0.25s ease-out both;
+  }
+
+  .tc-spinner-icon {
+    color: #e2a35f;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .tc-spinner-label {
+    color: #e2a35f;
+    font-style: italic;
+    font-size: 0.78rem;
+    font-weight: 500;
+  }
+
+  .tc-spinner-hint {
+    color: #555;
+    font-size: 0.72rem;
+  }
+
+  /* ─── Input area (Claude Code bordered box) ─── */
+  .terminal-input-area {
+    margin-top: 1rem;
+  }
+
+  .terminal-input-box {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.02);
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+  }
+
+  .input-caret {
+    color: #888;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+
+  .terminal-cursor {
+    display: inline-block;
+    width: 7px;
+    height: 1rem;
+    background: #5de4c7;
+    animation: cursor-blink 1s step-end infinite;
+    border-radius: 1px;
+    vertical-align: middle;
+    opacity: 0.85;
+  }
+
+  @keyframes cursor-blink {
+    0%, 100% { opacity: 0.85; }
+    50% { opacity: 0; }
+  }
+
+  /* ─── Accept edits hint ─── */
+  .terminal-edit-hint {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.15rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    user-select: none;
+  }
+
+  .edit-arrows {
+    color: #5de4c7;
+    font-weight: 600;
+  }
+
+  .edit-label {
+    color: #5de4c7;
+    font-weight: 500;
+  }
+
+  .edit-hint-dim {
+    color: #555;
+  }
+
+  /* ─── Email link ─── */
+  .tc-link {
+    color: #5de4c7;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: rgba(93, 228, 199, 0.35);
+    transition: text-decoration-color 0.2s ease;
+  }
+  .tc-link:hover {
+    text-decoration-color: #5de4c7;
+    color: #5de4c7;
+  }
+
+  /* ─── Replay button (bottom-right, circular) ─── */
+  .replay-btn {
+    position: absolute;
+    bottom: 5rem;
+    right: 1.25rem;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.35);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 15;
+    padding: 0;
+    backdrop-filter: blur(8px);
+  }
+
+  .replay-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.7);
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: scale(1.05);
+  }
+
+  .replay-btn:hover svg {
+    animation: replay-spin 0.6s ease-out;
+  }
+
+  .replay-btn:active {
+    transform: scale(0.92);
+  }
+
+  .replay-btn.visible {
+    display: flex;
+    animation: msg-enter 0.5s ease-out both;
+  }
+
+  @keyframes replay-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(-360deg); }
+  }
+
+  /* ─── Progress indicator (Sentry-style pill segments) ─── */
+  .terminal-progress {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.5rem 0.3rem;
+  }
+
+  .progress-segment {
+    height: 5px;
+    width: 2.75rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+    transition: background-color 0.4s ease, transform 0.3s ease;
+  }
+
+  .progress-segment.active {
+    background: #a3e635;
+    transform: scaleY(1.2);
+  }
+
+  .progress-segment.completed {
+    background: #a3e635;
+  }
+
+  /* ─── Phase label (Sentry-style: icon + bold title + description) ─── */
+  .terminal-phase {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0.15rem 1.5rem 0.5rem;
+    min-height: 2.6rem;
+    transition: opacity 0.35s ease;
+  }
+
+  .phase-content {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.1rem;
+  }
+
+  .phase-icon {
+    font-size: 0.85rem;
+    line-height: 1;
+  }
+
+  .phase-title {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.7);
+    letter-spacing: 0.01em;
+  }
+
+  .phase-desc {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.25);
+    letter-spacing: 0.01em;
+  }
+
+  /* ─── Status bar ─── */
+  .terminal-statusbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.45rem 1.25rem;
+    background: rgba(0, 0, 0, 0.3);
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: #555;
+    user-select: none;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .statusbar-left,
+  .statusbar-right {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .statusbar-sep {
+    color: rgba(255, 255, 255, 0.08);
+  }
+
+  .statusbar-model {
+    color: #888;
+    font-weight: 500;
+  }
+
+  .statusbar-path {
+    color: #555;
+  }
+
+  .statusbar-branch {
+    color: #4ade80;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .statusbar-tokens,
+  .statusbar-cost {
+    color: #666;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ─── Responsive ─── */
+  @media (max-width: 768px) {
+    .terminal-body {
+      padding: 1rem 1.1rem;
+      font-size: 0.76rem;
+      max-height: 440px;
+    }
+    .terminal-ascii-banner {
+      font-size: 0.62rem;
+      overflow-x: auto;
+      white-space: pre;
+      -webkit-overflow-scrolling: touch;
+    }
+    .statusbar-path { display: none; }
+    .tc-response-text { max-width: 100%; }
+    .progress-segment {
+      width: 2rem;
+    }
+
+    .replay-btn {
+      bottom: 4.5rem;
+      right: 0.75rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .terminal-body {
+      padding: 0.85rem;
+      min-height: 260px;
+      max-height: 380px;
+    }
+    .terminal-ascii-banner {
+      font-size: 0.5rem;
+    }
+    .terminal-statusbar {
+      font-size: 0.6rem;
+      padding: 0.4rem 0.85rem;
+    }
+    .statusbar-branch { display: none; }
+    .tc-response-block {
+      padding-left: 0.15rem;
+    }
+    .progress-segment {
+      width: 1.5rem;
+    }
+    .phase-desc {
+      font-size: 0.58rem;
+    }
+    .replay-btn {
+      width: 2rem;
+      height: 2rem;
+      bottom: 4rem;
+    }
+
+  }
+
+  @media (max-width: 360px) {
+    .terminal-ascii-banner {
+      display: none;
+    }
+    .terminal-body {
+      padding: 0.75rem;
+      font-size: 0.72rem;
+    }
+    .terminal-phase {
+      display: none;
+    }
+  }
+</style>

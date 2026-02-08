@@ -5,7 +5,7 @@
   <div class="container hero-grid">
     <div class="hero-content">
       <div class="hero-badge reveal">
-        <span class="text-label">Open to new opportunities</span>
+        <span class="text-label">Crafting great software</span>
         <span class="hero-badge-dot"></span>
       </div>
       <h1 class="text-display hero-title reveal reveal-delay-1">
@@ -196,6 +196,7 @@
 <style>
   .hero {
     min-height: 100vh;
+    min-height: 100dvh;
     display: flex;
     align-items: center;
     padding-top: 5rem;
@@ -283,6 +284,7 @@
     display: flex;
     align-items: center;
     gap: var(--space-2xl);
+    flex-wrap: wrap;
   }
   .hero-stat-num {
     display: block;
@@ -432,8 +434,17 @@
     }
   }
   @media (max-width: 480px) {
-    .hero-actions { flex-direction: column; }
-    .hero-stats { gap: var(--space-xl); }
+    .hero-actions {
+      flex-direction: column;
+    }
+    .hero-actions .btn {
+      text-align: center;
+      justify-content: center;
+    }
+    .hero-stats {
+      gap: var(--space-lg);
+      row-gap: var(--space-md);
+    }
     .hero-stat-divider { display: none; }
     .hero-visual { height: 220px; }
   }

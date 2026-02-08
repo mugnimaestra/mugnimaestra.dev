@@ -110,23 +110,37 @@ const navItems = [
   .nav-toggle.active span:last-child { bottom: 50%; transform: rotate(-45deg); }
 
   @media (max-width: 768px) {
+    .navbar {
+      padding: 1rem 1.25rem;
+    }
+    .navbar.scrolled {
+      padding: 0.65rem 1.25rem;
+    }
     .nav-toggle { display: block; }
     .nav-logo-text { display: none; }
     .nav-list {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 10000;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       gap: 1rem;
-      background: rgba(10, 10, 11, 0.97);
-      backdrop-filter: blur(20px);
+      background: rgba(10, 10, 11, 0.98);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.3s ease;
     }
     .nav-list.open { opacity: 1; pointer-events: all; }
-    .nav-link { font-size: 1.1rem; padding: 0.75rem 1.5rem; }
+    .nav-link {
+      font-size: 1.1rem;
+      padding: 0.75rem 1.5rem;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+    }
   }
 </style>
 
