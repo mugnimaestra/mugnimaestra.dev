@@ -1,0 +1,163 @@
+---
+const projects = [
+  {
+    title: 'Rukita.co — Web & Tenant App',
+    tag: 'Core Product',
+    desc: 'Indonesia\'s leading co-living platform with 1,500+ properties across 21 cities, serving users on web and mobile. Built with Next.js 14 + React Native. Features include property search, booking & payment flows, visitation scheduling, service requests, SEO optimization, i18n, and a full in-app real-time chat system.',
+    tech: ['Next.js', 'React Native', 'TypeScript', 'Tailwind CSS', 'React Query'],
+    url: 'https://www.rukita.co',
+    featured: true,
+  },
+  {
+    title: 'In-App Chat System',
+    tag: 'Core Feature',
+    desc: 'Real-time chat system embedded across Rukita\'s web, tenant app, and internal dashboard. Supports unit visitation chat, customer service, and WhatsApp-integrated sales communication. Built with WebSocket, FCM push notifications, CSAT ratings, file attachments, anonymous chat, and CS ticket management.',
+    tech: ['WebSocket', 'FCM', 'React Native', 'Service Workers'],
+    featured: true,
+  },
+  {
+    title: 'Internal Dashboard',
+    tag: 'Admin Platform',
+    desc: 'Enterprise admin dashboard migrated from Retool to custom Next.js platform. 15+ menus covering orders, invoices, tenants, landlords, promotions, SEO management, and a WhatsApp-integrated chat interface used by the sales team to communicate with prospective tenants.',
+    tech: ['Next.js', 'TypeScript', 'React Query'],
+  },
+  {
+    title: 'RuManage App',
+    tag: 'Mobile App',
+    desc: 'Landlord management mobile application for property owners. Features dashboards with analytics charts, property management, reports, Appsflyer integration, and marketing dashboards.',
+    tech: ['React Native', 'TypeScript', 'Appsflyer'],
+  },
+  {
+    title: 'Divhubinter Polri Portal',
+    tag: 'Government',
+    desc: 'Internal web portal for the Indonesian National Police International Relations Division (Divhubinter Polri).',
+    tech: ['Web Portal'],
+    url: 'https://divhubinter.polri.go.id/',
+  },
+  {
+    title: 'Interpol NCB Indonesia Portal',
+    tag: 'Government',
+    desc: 'Web portal for Indonesia\'s National Central Bureau (NCB), facilitating international police cooperation.',
+    tech: ['Web Portal'],
+    url: 'https://interpol.go.id/',
+  },
+  {
+    title: 'Wibuverse',
+    tag: 'Side Project',
+    desc: 'E-commerce platform for indie creators using React, Next.js, and Redux.',
+    tech: ['Next.js', 'React', 'Redux'],
+    url: 'https://www.wibuverse.com/',
+  },
+];
+---
+
+<section class="projects section" id="projects">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-label"><span class="text-label">Projects</span></div>
+      <h2 class="text-heading" style="font-size: clamp(2rem, 4vw, 3rem);">
+        What I've worked on
+      </h2>
+    </div>
+    <div class="projects-grid stagger-children">
+      {projects.map((p) => (
+        <div class={`project-card reveal ${p.featured ? 'featured' : ''}`}>
+          <div class="project-top">
+            <span class="project-tag">{p.tag}</span>
+            {p.url && (
+              <a href={p.url} target="_blank" rel="noopener" class="project-link" aria-label={`Visit ${p.title}`}>
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M7 17L17 7M17 7H7M17 7v10"/>
+                </svg>
+              </a>
+            )}
+          </div>
+          <h3 class="text-subheading project-title">{p.title}</h3>
+          <p class="project-desc">{p.desc}</p>
+          <div class="project-tech">
+            {p.tech.map((t) => <span class="tech-pill">{t}</span>)}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: var(--space-lg);
+  }
+  .project-card {
+    padding: 1.75rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    display: flex;
+    flex-direction: column;
+    transition: border-color 0.3s ease, transform 0.3s var(--ease-out-expo), box-shadow 0.3s ease;
+  }
+  .project-card:hover {
+    border-color: var(--border-accent);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-card);
+  }
+  .project-card.featured {
+    border-color: var(--border-accent);
+    background: linear-gradient(135deg, var(--bg-card) 0%, rgba(232, 168, 56, 0.04) 100%);
+  }
+  .project-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-lg);
+  }
+  .project-tag {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    padding: 0.3rem 0.65rem;
+    background: var(--accent-glow);
+    border-radius: var(--radius-full);
+  }
+  .project-link {
+    color: var(--text-tertiary);
+    transition: color 0.2s ease, transform 0.2s ease;
+  }
+  .project-link:hover {
+    color: var(--accent);
+    transform: translate(2px, -2px);
+  }
+  .project-title {
+    font-size: 1.3rem;
+    margin-bottom: var(--space-sm);
+  }
+  .project-desc {
+    color: var(--text-secondary);
+    font-size: 0.92rem;
+    line-height: 1.6;
+    flex: 1;
+    margin-bottom: var(--space-lg);
+  }
+  .project-tech {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+  .tech-pill {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    padding: 0.25rem 0.6rem;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-full);
+    color: var(--text-secondary);
+  }
+
+  @media (max-width: 480px) {
+    .projects-grid { grid-template-columns: 1fr; }
+  }
+</style>

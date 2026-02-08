@@ -1,0 +1,153 @@
+---
+const navItems = [
+  { label: 'About', href: '#about' },
+  { label: 'Experience', href: '#experience' },
+  { label: 'Projects', href: '#projects' },
+  { label: 'Skills', href: '#skills' },
+  { label: 'Contact', href: '#contact' },
+];
+---
+
+<nav class="navbar" id="navbar">
+  <a href="/" class="nav-logo">
+    <span class="nav-logo-mark">M</span>
+    <span class="nav-logo-text">mugnimaestra</span>
+  </a>
+  <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu">
+    <span></span><span></span>
+  </button>
+  <ul class="nav-list" id="nav-list">
+    {navItems.map((item) => (
+      <li><a href={item.href} class="nav-link">{item.label}</a></li>
+    ))}
+  </ul>
+</nav>
+
+<style>
+  .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 2rem;
+    background: rgba(10, 10, 11, 0.8);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border-subtle);
+    transition: padding 0.3s ease, background 0.3s ease;
+  }
+  .navbar.scrolled {
+    padding: 0.75rem 2rem;
+    background: rgba(10, 10, 11, 0.95);
+  }
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    color: var(--text-primary);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+  .nav-logo-mark {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: var(--accent);
+    color: var(--text-inverse);
+    font-size: 1.1rem;
+    font-weight: 800;
+    border-radius: 8px;
+  }
+  .nav-list {
+    display: flex;
+    list-style: none;
+    gap: 0.25rem;
+  }
+  .nav-link {
+    display: block;
+    padding: 0.5rem 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    border-radius: var(--radius-sm);
+    transition: color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+  }
+  .nav-link:hover {
+    color: var(--accent);
+    background: var(--accent-glow);
+  }
+  .nav-toggle {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 32px;
+    height: 24px;
+    position: relative;
+    z-index: 110;
+  }
+  .nav-toggle span {
+    display: block;
+    width: 100%;
+    height: 2px;
+    background: var(--text-primary);
+    position: absolute;
+    left: 0;
+    transition: all 0.3s ease;
+  }
+  .nav-toggle span:first-child { top: 4px; }
+  .nav-toggle span:last-child { bottom: 4px; }
+  .nav-toggle.active span:first-child { top: 50%; transform: rotate(45deg); }
+  .nav-toggle.active span:last-child { bottom: 50%; transform: rotate(-45deg); }
+
+  @media (max-width: 768px) {
+    .nav-toggle { display: block; }
+    .nav-logo-text { display: none; }
+    .nav-list {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+      background: rgba(10, 10, 11, 0.97);
+      backdrop-filter: blur(20px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .nav-list.open { opacity: 1; pointer-events: all; }
+    .nav-link { font-size: 1.1rem; padding: 0.75rem 1.5rem; }
+  }
+</style>
+
+<script>
+  const navbar = document.getElementById('navbar');
+  const toggle = document.getElementById('nav-toggle');
+  const list = document.getElementById('nav-list');
+
+  window.addEventListener('scroll', () => {
+    navbar?.classList.toggle('scrolled', window.scrollY > 50);
+  });
+
+  toggle?.addEventListener('click', () => {
+    toggle.classList.toggle('active');
+    list?.classList.toggle('open');
+  });
+
+  list?.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => {
+      toggle?.classList.remove('active');
+      list?.classList.remove('open');
+    });
+  });
+</script>

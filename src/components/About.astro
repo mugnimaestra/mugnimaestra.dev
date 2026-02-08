@@ -1,0 +1,110 @@
+---
+---
+
+<section class="about section" id="about">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-label"><span class="text-label">About Me</span></div>
+      <h2 class="text-heading" style="font-size: clamp(2rem, 4vw, 3rem);">
+        Building things end to end
+      </h2>
+    </div>
+    <div class="about-grid">
+      <div class="about-text reveal reveal-delay-1">
+        <p class="text-body" style="color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 1.5rem;">
+          I'm Mugni — a Software Engineer with <strong style="color: var(--text-primary);">7+ years</strong> of 
+          experience shipping web and mobile products. I care about the full picture: from 
+          architecture decisions to the user clicking a button.
+        </p>
+        <p class="text-body" style="color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 1.5rem;">
+          I'm big on <strong style="color: var(--accent);">AI-assisted development</strong> — it's changed how I 
+          work and ship. My stack centers on 
+          <strong style="color: var(--accent);">React, Next.js, React Native, and TypeScript</strong>, 
+          with a focus on reliability and testing.
+        </p>
+        <p class="text-body" style="color: var(--text-secondary); font-size: 1.1rem;">
+          Currently at <strong style="color: var(--text-primary);">Rukita</strong>, Indonesia's leading 
+          proptech platform with <strong style="color: var(--accent);">1,500+ rental properties</strong> across 21 cities. 
+          I work across web, mobile, and internal tools — wherever the team needs me.
+        </p>
+      </div>
+      <div class="about-details reveal reveal-delay-2">
+        <div class="detail-card">
+          <span class="detail-icon">📍</span>
+          <div>
+            <span class="detail-key">Location</span>
+            <span class="detail-val">Jakarta, Indonesia</span>
+          </div>
+        </div>
+        <div class="detail-card">
+          <span class="detail-icon">🎓</span>
+          <div>
+            <span class="detail-key">Education</span>
+            <span class="detail-val">S.TI — Universitas Gunadarma</span>
+          </div>
+        </div>
+        <div class="detail-card">
+          <span class="detail-icon">💼</span>
+          <div>
+            <span class="detail-key">Current Role</span>
+            <span class="detail-val">Software Engineer @ Rukita</span>
+          </div>
+        </div>
+        <div class="detail-card">
+          <span class="detail-icon">🧪</span>
+          <div>
+            <span class="detail-key">Focus</span>
+            <span class="detail-val">AI-Assisted Dev, Performance, Testing</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: var(--space-3xl);
+    align-items: start;
+  }
+  .about-details {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+  .detail-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: 1rem 1.25rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    transition: border-color 0.3s ease, transform 0.3s ease;
+  }
+  .detail-card:hover {
+    border-color: var(--border-accent);
+    transform: translateX(4px);
+  }
+  .detail-icon { font-size: 1.5rem; flex-shrink: 0; }
+  .detail-key {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-tertiary);
+    margin-bottom: 2px;
+  }
+  .detail-val {
+    display: block;
+    font-weight: 500;
+    font-size: 0.95rem;
+  }
+
+  @media (max-width: 768px) {
+    .about-grid { grid-template-columns: 1fr; }
+  }
+</style>

@@ -1,0 +1,440 @@
+---
+---
+
+<section class="hero" id="hero">
+  <div class="container hero-grid">
+    <div class="hero-content">
+      <div class="hero-badge reveal">
+        <span class="text-label">Open to new opportunities</span>
+        <span class="hero-badge-dot"></span>
+      </div>
+      <h1 class="text-display hero-title reveal reveal-delay-1">
+        Muhammad<br/>
+        <span class="hero-accent">Mugni</span> Hadi
+      </h1>
+      <p class="hero-role reveal reveal-delay-2">Software Engineer</p>
+      <p class="hero-desc text-body reveal reveal-delay-3">
+        Building products people use every day — from real-time chat systems to 
+        cross-platform mobile apps. <span class="hero-highlight">7+ years</span> shipping 
+        web and mobile experiences with React, Next.js, and React Native.
+      </p>
+      <div class="hero-actions reveal reveal-delay-4">
+        <a href="mailto:iam@mugnimaestra.dev" class="btn btn-primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;">
+            <rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+          </svg>
+          Get in touch
+        </a>
+        <a href="#projects" class="btn btn-outline">View my work</a>
+      </div>
+      <div class="hero-stats reveal reveal-delay-5">
+        <div class="hero-stat">
+          <span class="hero-stat-num">7+</span>
+          <span class="hero-stat-label">Years Exp.</span>
+        </div>
+        <div class="hero-stat-divider"></div>
+        <div class="hero-stat">
+          <span class="hero-stat-num">297+</span>
+          <span class="hero-stat-label">Features Shipped</span>
+        </div>
+        <div class="hero-stat-divider"></div>
+        <div class="hero-stat">
+          <span class="hero-stat-num">8</span>
+          <span class="hero-stat-label">Products Built</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Animated Network Visual -->
+    <div class="hero-visual reveal reveal-delay-2">
+      <canvas id="hero-canvas"></canvas>
+      <div class="hero-visual-overlay">
+        <div class="tech-float tech-float-1">React</div>
+        <div class="tech-float tech-float-2">Next.js</div>
+        <div class="tech-float tech-float-3">TypeScript</div>
+        <div class="tech-float tech-float-4">React Native</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-scroll-indicator reveal reveal-delay-6">
+    <div class="scroll-line"></div>
+    <span>scroll</span>
+  </div>
+</section>
+
+<script>
+  // Constellation / Network animation
+  const canvas = document.getElementById('hero-canvas') as HTMLCanvasElement;
+  if (canvas) {
+    const ctx = canvas.getContext('2d')!;
+    let animationId: number;
+    let mouseX = 0;
+    let mouseY = 0;
+
+    interface Node {
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+      radius: number;
+      baseX: number;
+      baseY: number;
+    }
+
+    const nodes: Node[] = [];
+    const NODE_COUNT = 35;
+    const CONNECTION_DISTANCE = 120;
+    const ACCENT = { r: 232, g: 168, b: 56 }; // #e8a838
+
+    function resize() {
+      const rect = canvas.parentElement!.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+    }
+
+    function initNodes() {
+      nodes.length = 0;
+      for (let i = 0; i < NODE_COUNT; i++) {
+        const x = Math.random() * canvas.width;
+        const y = Math.random() * canvas.height;
+        nodes.push({
+          x, y,
+          baseX: x,
+          baseY: y,
+          vx: (Math.random() - 0.5) * 0.3,
+          vy: (Math.random() - 0.5) * 0.3,
+          radius: Math.random() * 2 + 1,
+        });
+      }
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw connections
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const dx = nodes[i].x - nodes[j].x;
+          const dy = nodes[i].y - nodes[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < CONNECTION_DISTANCE) {
+            const opacity = (1 - dist / CONNECTION_DISTANCE) * 0.25;
+            ctx.beginPath();
+            ctx.moveTo(nodes[i].x, nodes[i].y);
+            ctx.lineTo(nodes[j].x, nodes[j].y);
+            ctx.strokeStyle = `rgba(${ACCENT.r}, ${ACCENT.g}, ${ACCENT.b}, ${opacity})`;
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Draw nodes
+      for (const node of nodes) {
+        // Mouse interaction — gentle push
+        const dmx = node.x - mouseX;
+        const dmy = node.y - mouseY;
+        const mouseDist = Math.sqrt(dmx * dmx + dmy * dmy);
+        if (mouseDist < 100 && mouseDist > 0) {
+          const force = (100 - mouseDist) / 100 * 0.5;
+          node.vx += (dmx / mouseDist) * force;
+          node.vy += (dmy / mouseDist) * force;
+        }
+
+        // Drift gently
+        node.x += node.vx;
+        node.y += node.vy;
+
+        // Dampen & return to base
+        node.vx *= 0.98;
+        node.vy *= 0.98;
+        node.vx += (node.baseX - node.x) * 0.002;
+        node.vy += (node.baseY - node.y) * 0.002;
+
+        // Wrap
+        if (node.x < 0) node.x = canvas.width;
+        if (node.x > canvas.width) node.x = 0;
+        if (node.y < 0) node.y = canvas.height;
+        if (node.y > canvas.height) node.y = 0;
+
+        // Draw
+        const glow = ctx.createRadialGradient(node.x, node.y, 0, node.x, node.y, node.radius * 4);
+        glow.addColorStop(0, `rgba(${ACCENT.r}, ${ACCENT.g}, ${ACCENT.b}, 0.6)`);
+        glow.addColorStop(1, `rgba(${ACCENT.r}, ${ACCENT.g}, ${ACCENT.b}, 0)`);
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, node.radius * 4, 0, Math.PI * 2);
+        ctx.fillStyle = glow;
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${ACCENT.r}, ${ACCENT.g}, ${ACCENT.b}, 0.8)`;
+        ctx.fill();
+      }
+
+      animationId = requestAnimationFrame(draw);
+    }
+
+    canvas.addEventListener('mousemove', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      mouseX = e.clientX - rect.left;
+      mouseY = e.clientY - rect.top;
+    });
+
+    resize();
+    initNodes();
+    draw();
+
+    window.addEventListener('resize', () => {
+      resize();
+      initNodes();
+    });
+  }
+</script>
+
+<style>
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding-top: 5rem;
+    padding-bottom: 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -30%;
+    right: -10%;
+    width: 700px;
+    height: 700px;
+    background: radial-gradient(circle, var(--accent-glow) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: var(--space-2xl);
+    align-items: center;
+    width: 100%;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--border-accent);
+    border-radius: var(--radius-full);
+    margin-bottom: var(--space-lg);
+    background: var(--accent-glow);
+  }
+  .hero-badge-dot {
+    width: 6px; height: 6px;
+    background: #4ade80;
+    border-radius: 50%;
+    animation: pulse-dot 2s infinite;
+  }
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.5); }
+    50% { opacity: 0.7; box-shadow: 0 0 0 6px rgba(74, 222, 128, 0); }
+  }
+
+  .hero-title {
+    font-size: clamp(3rem, 6vw, 5.5rem);
+    margin-bottom: var(--space-md);
+  }
+  .hero-accent {
+    color: var(--accent);
+  }
+  .hero-role {
+    font-family: var(--font-mono);
+    font-size: 1.05rem;
+    color: var(--accent);
+    margin-bottom: var(--space-lg);
+    letter-spacing: 0.02em;
+  }
+  .hero-desc {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    max-width: 520px;
+    margin-bottom: var(--space-xl);
+  }
+  .hero-highlight {
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .hero-actions {
+    display: flex;
+    gap: var(--space-md);
+    margin-bottom: var(--space-3xl);
+  }
+
+  /* Stats row */
+  .hero-stats {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2xl);
+  }
+  .hero-stat-num {
+    display: block;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 2rem;
+    color: var(--text-primary);
+  }
+  .hero-stat-label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .hero-stat-divider {
+    width: 1px;
+    height: 40px;
+    background: var(--border-medium);
+  }
+
+  /* Visual: Canvas + floating tech labels */
+  .hero-visual {
+    position: relative;
+    height: 480px;
+  }
+  #hero-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .hero-visual-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .tech-float {
+    position: absolute;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+    padding: 0.35rem 0.85rem;
+    border: 1px solid var(--border-accent);
+    border-radius: var(--radius-full);
+    background: rgba(10, 10, 11, 0.7);
+    backdrop-filter: blur(8px);
+    animation: float 6s ease-in-out infinite;
+  }
+  .tech-float-1 {
+    top: 15%;
+    left: 20%;
+    animation-delay: 0s;
+  }
+  .tech-float-2 {
+    top: 35%;
+    right: 10%;
+    animation-delay: 1.5s;
+  }
+  .tech-float-3 {
+    bottom: 30%;
+    left: 10%;
+    animation-delay: 3s;
+  }
+  .tech-float-4 {
+    bottom: 15%;
+    right: 25%;
+    animation-delay: 4.5s;
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.85rem 1.75rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.95rem;
+    border-radius: var(--radius-md);
+    transition: all 0.3s var(--ease-out-expo);
+    cursor: pointer;
+    border: none;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: var(--text-inverse);
+  }
+  .btn-primary:hover {
+    background: #f0b84e;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow);
+    color: var(--text-inverse);
+  }
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--border-medium);
+    color: var(--text-primary);
+  }
+  .btn-outline:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: translateY(-2px);
+  }
+
+  /* Scroll indicator */
+  .hero-scroll-indicator {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .hero-scroll-indicator span {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--text-tertiary);
+  }
+  .scroll-line {
+    width: 1px; height: 40px;
+    background: linear-gradient(to bottom, var(--accent), transparent);
+    animation: scroll-down 2s infinite;
+  }
+  @keyframes scroll-down {
+    0% { transform: scaleY(0); transform-origin: top; }
+    50% { transform: scaleY(1); transform-origin: top; }
+    51% { transform: scaleY(1); transform-origin: bottom; }
+    100% { transform: scaleY(0); transform-origin: bottom; }
+  }
+
+  @media (max-width: 900px) {
+    .hero-grid {
+      grid-template-columns: 1fr;
+    }
+    .hero-visual {
+      height: 300px;
+    }
+  }
+  @media (max-width: 480px) {
+    .hero-actions { flex-direction: column; }
+    .hero-stats { gap: var(--space-xl); }
+    .hero-stat-divider { display: none; }
+    .hero-visual { height: 220px; }
+  }
+</style>

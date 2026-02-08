@@ -1,0 +1,88 @@
+---
+const categories = [
+  {
+    label: 'Languages',
+    skills: ['JavaScript', 'TypeScript'],
+  },
+  {
+    label: 'Frameworks',
+    skills: ['React', 'Next.js', 'React Native', 'Tailwind CSS', 'Node.js'],
+  },
+  {
+    label: 'Testing & Quality',
+    skills: ['Jest', 'Playwright', 'Storybook'],
+  },
+  {
+    label: 'Tools & Services',
+    skills: ['Git', 'Firebase', 'Sentry', 'TanStack Query'],
+  },
+  {
+    label: 'AI-Assisted Development',
+    skills: ['Github Copilot', 'Claude Code'],
+  },
+];
+---
+
+<section class="skills section" id="skills">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-label"><span class="text-label">Skills</span></div>
+      <h2 class="text-heading" style="font-size: clamp(2rem, 4vw, 3rem);">
+        My toolkit
+      </h2>
+    </div>
+    <div class="skills-grid stagger-children">
+      {categories.map((cat) => (
+        <div class="skill-group reveal">
+          <h3 class="skill-group-title">{cat.label}</h3>
+          <div class="skill-tags">
+            {cat.skills.map((s) => <span class="skill-tag">{s}</span>)}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: var(--space-lg);
+  }
+  .skill-group {
+    padding: 1.5rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    transition: border-color 0.3s ease;
+  }
+  .skill-group:hover {
+    border-color: var(--border-accent);
+  }
+  .skill-group-title {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    margin-bottom: var(--space-md);
+  }
+  .skill-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+  .skill-tag {
+    font-size: 0.85rem;
+    padding: 0.35rem 0.75rem;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-full);
+    color: var(--text-secondary);
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+  .skill-tag:hover {
+    background: var(--accent-glow);
+    color: var(--accent);
+  }
+</style>
