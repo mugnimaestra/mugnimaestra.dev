@@ -13,10 +13,16 @@ const navItems = [
     <span class="nav-logo-mark">M</span>
     <span class="nav-logo-text">mugnimaestra</span>
   </a>
-  <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu">
-    <span></span><span></span>
+  <button
+    class="nav-toggle"
+    id="nav-toggle"
+    aria-label="Toggle menu"
+    aria-expanded="false"
+    aria-controls="nav-list"
+  >
+    <span aria-hidden="true"></span><span aria-hidden="true"></span>
   </button>
-  <ul class="nav-list" id="nav-list">
+  <ul class="nav-list" id="nav-list" aria-hidden="true">
     {navItems.map((item) => (
       <li><a href={item.href} class="nav-link">{item.label}</a></li>
     ))}
@@ -90,22 +96,23 @@ const navItems = [
     background: none;
     border: none;
     cursor: pointer;
-    width: 32px;
-    height: 24px;
+    width: 44px;
+    height: 44px;
     position: relative;
     z-index: 110;
   }
   .nav-toggle span {
     display: block;
-    width: 100%;
+    width: 24px;
     height: 2px;
     background: var(--text-primary);
     position: absolute;
-    left: 0;
+    left: 50%;
+    margin-left: -12px;
     transition: all 0.3s ease;
   }
-  .nav-toggle span:first-child { top: 4px; }
-  .nav-toggle span:last-child { bottom: 4px; }
+  .nav-toggle span:first-child { top: 14px; }
+  .nav-toggle span:last-child { bottom: 14px; }
   .nav-toggle.active span:first-child { top: 50%; transform: rotate(45deg); }
   .nav-toggle.active span:last-child { bottom: 50%; transform: rotate(-45deg); }
 
@@ -131,9 +138,14 @@ const navItems = [
       -webkit-backdrop-filter: blur(24px);
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.3s ease;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
     }
-    .nav-list.open { opacity: 1; pointer-events: all; }
+    .nav-list.open {
+      opacity: 1;
+      pointer-events: all;
+      visibility: visible;
+    }
     .nav-link {
       font-size: 1.1rem;
       padding: 0.75rem 1.5rem;
@@ -146,22 +158,77 @@ const navItems = [
 
 <script>
   const navbar = document.getElementById('navbar');
-  const toggle = document.getElementById('nav-toggle');
+  const toggle = document.getElementById('nav-toggle') as HTMLButtonElement | null;
   const list = document.getElementById('nav-list');
 
   window.addEventListener('scroll', () => {
     navbar?.classList.toggle('scrolled', window.scrollY > 50);
   });
 
+  function setMenuOpen(open: boolean) {
+    if (!toggle || !list) return;
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    toggle.classList.toggle('active', open);
+    list.classList.toggle('open', open);
+    list.setAttribute('aria-hidden', open ? 'false' : 'true');
+    document.body.style.overflow = open ? 'hidden' : '';
+    if (open) {
+      // Focus first menu link for keyboard users
+      const firstLink = list.querySelector<HTMLAnchorElement>('a');
+      firstLink?.focus();
+    } else {
+      // Return focus to toggle on close
+      toggle.focus();
+    }
+  }
+
   toggle?.addEventListener('click', () => {
-    toggle.classList.toggle('active');
-    list?.classList.toggle('open');
+    const isOpen = toggle.getAttribute('aria-expanded') === 'true';
+    setMenuOpen(!isOpen);
   });
 
-  list?.querySelectorAll('a').forEach(a => {
+  // Close on Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && toggle?.getAttribute('aria-expanded') === 'true') {
+      setMenuOpen(false);
+    }
+  });
+
+  // Focus trap inside open mobile menu
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Tab') return;
+    if (toggle?.getAttribute('aria-expanded') !== 'true') return;
+    if (!list) return;
+
+    const focusable = list.querySelectorAll<HTMLAnchorElement>('a');
+    if (focusable.length === 0) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  });
+
+  // Close when a link is clicked
+  list?.querySelectorAll('a').forEach((a) => {
     a.addEventListener('click', () => {
-      toggle?.classList.remove('active');
-      list?.classList.remove('open');
+      setMenuOpen(false);
     });
   });
+
+  // Reset menu state when resizing past mobile breakpoint
+  const mq = window.matchMedia('(min-width: 769px)');
+  mq.addEventListener('change', (e) => {
+    if (e.matches && toggle?.getAttribute('aria-expanded') === 'true') {
+      setMenuOpen(false);
+    }
+  });
+
+  // Initialize aria-hidden on load — mobile menu starts closed
+  list?.setAttribute('aria-hidden', 'true');
 </script>

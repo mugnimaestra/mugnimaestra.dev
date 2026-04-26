@@ -4,8 +4,6 @@
    Palette: Deep charcoal + warm amber + ivory text
    ====================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap');
-
 /* ── Tokens ── */
 :root {
   /* Surface */
@@ -25,7 +23,7 @@
   /* Text */
   --text-primary: #f0ece4;
   --text-secondary: #9d9d9d;
-  --text-tertiary: #6b6b6b;
+  --text-tertiary: #8a8a8a;
   --text-inverse: #0a0a0b;
 
   /* Borders */
@@ -113,6 +111,28 @@ a:hover {
   color: var(--text-primary);
 }
 
+/* ── Skip Link ── */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 1rem;
+  z-index: 10000;
+  padding: 0.75rem 1.25rem;
+  background: var(--accent);
+  color: var(--text-inverse);
+  font-family: var(--font-display);
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+  top: 1rem;
+  outline: 2px solid var(--text-primary);
+  outline-offset: 2px;
+}
+
 /* ── Typography Scale ── */
 .text-display {
   font-family: var(--font-display);
@@ -169,6 +189,10 @@ a:hover {
 .section {
   padding: var(--space-5xl) 0;
   position: relative;
+}
+
+section[id] {
+  scroll-margin-top: 5rem;
 }
 
 .section-header {

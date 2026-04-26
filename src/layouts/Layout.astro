@@ -2,12 +2,18 @@
 interface Props {
   title?: string;
   description?: string;
+  image?: string;
 }
 
 const {
   title = 'Mugni Hadi — Full-Stack Engineer · React, Next.js, React Native',
   description = 'Full-stack engineer with 7+ years and 297+ features shipped across 8 products. Scaled platforms to 30K+ monthly users. React, Next.js, React Native, TypeScript.',
+  image = '/og-image.png',
 } = Astro.props;
+
+const siteURL = Astro.site ?? new URL('https://mugnimaestra.dev');
+const canonicalURL = new URL(Astro.url.pathname, siteURL);
+const ogImageURL = new URL(image, siteURL);
 ---
 
 <!doctype html>
@@ -17,22 +23,40 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
     <meta name="author" content="Muhammad Mugni Hadi" />
+    <link rel="canonical" href={canonicalURL} />
 
     <!-- Open Graph -->
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://mugnimaestra.dev" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:image" content={ogImageURL} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Muhammad Mugni Hadi — Full-Stack Engineer" />
+    <meta property="og:site_name" content="mugnimaestra.dev" />
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageURL} />
+    <meta name="twitter:image:alt" content="Muhammad Mugni Hadi — Full-Stack Engineer" />
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap"
+    />
     <title>{title}</title>
   </head>
   <body>
+    <a href="#main" class="skip-link">Skip to content</a>
     <div class="grain-overlay" aria-hidden="true"></div>
     <slot />
 
@@ -52,15 +76,20 @@ const {
       );
       reveals.forEach((el) => observer.observe(el));
 
-      // Smooth magnetic cursor effect on nav links
+      // Smooth magnetic cursor effect on nav links — cache rect to avoid layout thrash
       document.querySelectorAll('.nav-link').forEach((link) => {
+        let rect: DOMRect | null = null;
+        link.addEventListener('mouseenter', (e) => {
+          rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+        });
         link.addEventListener('mousemove', (e) => {
-          const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-          const x = e.clientX - rect.left - rect.width / 2;
-          const y = e.clientY - rect.top - rect.height / 2;
+          if (!rect) return;
+          const x = (e as MouseEvent).clientX - rect.left - rect.width / 2;
+          const y = (e as MouseEvent).clientY - rect.top - rect.height / 2;
           (e.currentTarget as HTMLElement).style.transform = `translate(${x * 0.15}px, ${y * 0.15}px)`;
         });
         link.addEventListener('mouseleave', (e) => {
+          rect = null;
           (e.currentTarget as HTMLElement).style.transform = 'translate(0, 0)';
         });
       });

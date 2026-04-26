@@ -411,14 +411,74 @@
     spinnerEl.remove();
   }
 
+  // ── Render final state instantly (for reduced-motion users) ──
+  function renderFinalState() {
+    // Hide spinner/input area while building
+    inputArea.style.display = 'none';
+
+    for (let i = 0; i < conversation.length; i++) {
+      const msg = conversation[i];
+
+      if (msg.role === 'user') {
+        const msgEl = createUserMessage(msg.content);
+        messagesContainer.appendChild(msgEl);
+        const textEl = msgEl.querySelector('.tc-user-input') as HTMLElement;
+        textEl.textContent = msg.content;
+      } else {
+        // Tool call indicator (static, no delay)
+        if ((msg as any).toolCall) {
+          const el = document.createElement('div');
+          el.className = 'tc-toolcall';
+          el.innerHTML = `<span class="tc-toolcall-icon">⚡</span><span class="tc-toolcall-tag"> claude </span><span class="tc-toolcall-dash">— </span><span class="tc-toolcall-name">${(msg as any).toolCall} </span><span class="tc-toolcall-badge">(MCP)</span>`;
+          messagesContainer.appendChild(el);
+        }
+
+        const msgEl = createAssistantMessage();
+        messagesContainer.appendChild(msgEl);
+        const textEl = msgEl.querySelector('.tc-response-text') as HTMLElement;
+        textEl.textContent = msg.content;
+
+        if ((msg as any).isLast) {
+          textEl.innerHTML = textEl.textContent!.replace(
+            'iam@mugnimaestra.dev',
+            '<a href="mailto:iam@mugnimaestra.dev" class="tc-link">iam@mugnimaestra.dev</a>'
+          );
+        }
+      }
+    }
+
+    // Set final stats directly (no animated counter)
+    const finalAssistant = conversation.filter((m) => m.role === 'assistant').slice(-1)[0] as any;
+    tokenDisplay.textContent = `${finalAssistant.tokens.toLocaleString()} tokens`;
+    costDisplay.textContent = `$${finalAssistant.cost.toFixed(2)}`;
+    prevTokens = finalAssistant.tokens;
+    prevCost = finalAssistant.cost;
+
+    // Mark all phases complete
+    completeAllProgress();
+    showCompletionLabel();
+
+    // Show idle input area
+    inputArea.style.display = 'block';
+    scrollToBottom();
+    replayBtn.classList.add('visible');
+  }
+
   // ── Main playback ──
   async function playConversation() {
     if (hasPlayed) return;
     hasPlayed = true;
 
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     // Terminal glow on activation
     terminalWrapper.classList.add('activated');
 
+    if (prefersReducedMotion) {
+      // Render final state instantly — no typewriter, no spinner
+      renderFinalState();
+      return;
+    }
 
     await delay(INITIAL_DELAY);
 
@@ -806,9 +866,9 @@
     position: absolute;
     bottom: 5rem;
     right: 1.25rem;
-    width: 2.25rem;
-    height: 2.25rem;
-    border-radius: 12px;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 14px;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.08);
     color: rgba(255, 255, 255, 0.35);
@@ -979,6 +1039,8 @@
     }
 
     .replay-btn {
+      width: 2.94rem;
+      height: 2.94rem;
       bottom: 4.5rem;
       right: 0.75rem;
     }
@@ -1008,8 +1070,8 @@
       font-size: 0.58rem;
     }
     .replay-btn {
-      width: 2rem;
-      height: 2rem;
+      width: 3.15rem;
+      height: 3.15rem;
       bottom: 4rem;
     }
 
